@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visit Sri Lanka 🇱🇰</title>
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+background:linear-gradient(135deg,#00b4d8,#90e0ef);
+color:#111;
+transition:0.5s;
+min-height:100vh;
+}
+
+body.dark{
+background:#0f172a;
+color:white;
+}
+
+header{
+background:#0077b6;
+color:white;
+padding:20px;
+text-align:center;
+font-size:28px;
+font-weight:bold;
+position:sticky;
+top:0;
+z-index:999;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
+}
+
+.topbar{
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:10px;
+padding:15px;
+}
+
+.topbar button{
+padding:10px 15px;
+border:none;
+border-radius:30px;
+background:#0077b6;
+color:white;
+cursor:pointer;
+transition:0.3s;
+}
+
+.topbar button:hover{
+transform:scale(1.05);
+background:#0096c7;
+}
+
+.search-box{
+text-align:center;
+padding:10px;
+}
+
+.search-box input{
+width:80%;
+padding:12px;
+border:none;
+border-radius:30px;
+font-size:16px;
+}
+
+.places{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+gap:15px;
+padding:15px;
+}
+
+.place{
+background:white;
+padding:20px;
+border-radius:20px;
+text-align:center;
+font-weight:bold;
+cursor:pointer;
+transition:0.4s;
+}
+
+body.dark .place{
+background:#1e293b;
+color:white;
+}
+
+.place:hover{
+transform:translateY(-10px) scale(1.04);
+box-shadow:0 15px 25px rgba(0,0,0,0.2);
+}
+
+#details{
+display:none;
+padding:15px;
+}
+
+.card{
+background:white;
+padding:15px;
+border-radius:20px;
+margin-bottom:20px;
+transition:0.4s;
+animation:fade 0.5s;
+}
+
+body.dark .card{
+background:#1e293b;
+color:white;
+}
+
+.card:hover{
+transform:translateY(-5px);
+box-shadow:0 10px 20px rgba(0,0,0,0.2);
+}
+
+.card img{
+width:100%;
+height:220px;
+object-fit:cover;
+border-radius:15px;
+margin-bottom:10px;
+}
+
+button.action{
+padding:10px 14px;
+border:none;
+border-radius:10px;
+background:#0077b6;
+color:white;
+margin-top:10px;
+cursor:pointer;
+}
+
+.review{
+background:#f1f1f1;
+padding:10px;
+border-radius:10px;
+margin-top:8px;
+}
+
+body.dark .review{
+background:#334155;
+}
+
+textarea{
+width:100%;
+padding:10px;
+border-radius:10px;
+margin-top:10px;
+resize:none;
+}
+
+iframe{
+border:none;
+border-radius:15px;
+margin-top:10px;
+}
+
+.gallery{
+display:flex;
+gap:10px;
+overflow-x:auto;
+margin-top:10px;
+}
+
+.gallery img{
+width:240px;
+height:160px;
+flex-shrink:0;
+}
+
+.tip{
+padding:10px;
+background:#dff6ff;
+border-radius:10px;
+margin-top:8px;
+}
+
+body.dark .tip{
+background:#334155;
+}
+
+.notification{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#0077b6;
+color:white;
+padding:15px;
+border-radius:15px;
+display:none;
+z-index:9999;
+}
+
+@keyframes fade{
+from{
+opacity:0;
+transform:translateY(20px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+🌴 Visit Sri Lanka 🇱🇰
+</header>
+
+<div class="topbar">
+
+<button onclick="showHome()">🏠 Home</button>
+
+<button onclick="showFavorites()">❤️ Favorites</button>
+
+<button onclick="toggleDarkMode()">🌙 Dark Mode</button>
+
+<button onclick="showTrending()">🔥 Trending</button>
+
+<button onclick="showTravelTips()">🧳 Travel Tips</button>
+
+<button onclick="showAirportInfo()">✈ Airport</button>
+
+<button onclick="showTrainInfo()">🚆 Trains</button>
+
+<button onclick="showLiveTrainSchedule()">🚉 Live Trains</button>
+
+<button onclick="getUserLocation()">📍 Near Me</button>
+
+<button onclick="languageToggle()">🌍 Sinhala / English</button>
+
+</div>
+
+<div class="search-box">
+
+<input type="text"
+placeholder="🔍 Search District..."
+onkeyup="search(this.value)">
+
+</div>
+
+<div id="home" class="places"></div>
+
+<div id="details">
+
+<h2 id="title"></h2>
+
+<div id="content"></div>
+
+<button class="action" onclick="showHome()">
+⬅ Back
+</button>
+
+</div>
+
+<div class="notification" id="notify"></div>
+
+<script>
+
+let sinhala=false;
+
+let districts=[
+
+"Ampara",
+"Anuradhapura",
+"Badulla",
+"Batticaloa",
+"Colombo",
+"Galle",
+"Gampaha",
+"Hambantota",
+"Jaffna",
+"Kalutara",
+"Kandy",
+"Kegalle",
+"Kilinochchi",
+"Kurunegala",
+"Mannar",
+"Matale",
+"Matara",
+"Monaragala",
+"Mullaitivu",
+"Nuwara Eliya",
+"Polonnaruwa",
+"Puttalam",
+"Ratnapura",
+"Trincomalee",
+"Vavuniya"
+
+];
+
+let places={
+
+"Ampara":[
+"Arugam Bay",
+"Kumana National Park",
+"Muhudu Maha Viharaya",
+"Gal Oya National Park"
+],
+
+"Anuradhapura":[
+"Ruwanwelisaya",
+"Sri Maha Bodhi",
+"Mihintale",
+"Jetavanaramaya"
+],
+
+"Badulla":[
+"Ella",
+"Nine Arches Bridge",
+"Ravana Falls",
+"Little Adam's Peak"
+],
+
+"Batticaloa":[
+"Pasikuda Beach",
+"Batticaloa Fort",
+"Kallady Bridge",
+"Batticaloa Lighthouse"
+],
+
+"Colombo":[
+"Lotus Tower",
+"Galle Face Green",
+"Gangaramaya Temple",
+"Independence Square"
+],
+
+"Galle":[
+"Galle Fort",
+"Unawatuna Beach",
+"Jungle Beach",
+"Hikkaduwa Beach"
+],
+
+"Gampaha":[
+"Negombo Beach",
+"Kelaniya Temple",
+"Dutch Canal",
+"Muthurajawela"
+],
+
+"Hambantota":[
+"Yala National Park",
+"Bundala National Park",
+"Tangalle Beach",
+"Ridiyagama Safari Park"
+],
+
+"Jaffna":[
+"Jaffna Fort",
+"Nallur Kandaswamy Temple",
+"Casuarina Beach",
+"Delft Island"
+],
+
+"Kalutara":[
+"Kalutara Bodhiya",
+"Bentota Beach",
+"Richmond Castle",
+"Brief Garden"
+],
+
+"Kandy":[
+"Temple of the Tooth",
+"Kandy Lake",
+"Royal Botanical Garden",
+"Bahirawakanda Temple"
+],
+
+"Kegalle":[
+"Pinnawala Elephant Orphanage",
+"Kitulgala",
+"Belilena Cave",
+"Asupini Ella Falls"
+],
+
+"Kilinochchi":[
+"Iranamadu Tank",
+"Elephant Pass",
+"War Memorial",
+"A9 Road"
+],
+
+"Kurunegala":[
+"Athugala Rock",
+"Yapahuwa",
+"Ridi Viharaya",
+"Panduwasnuwara"
+],
+
+"Mannar":[
+"Mannar Fort",
+"Adam's Bridge",
+"Baobab Tree",
+"Mannar Beach"
+],
+
+"Matale":[
+"Sigiriya",
+"Dambulla Cave Temple",
+"Riverston",
+"Sembuwatta Lake"
+],
+
+"Matara":[
+"Mirissa Beach",
+"Polhena Beach",
+"Coconut Tree Hill",
+"Matara Lighthouse"
+],
+
+"Monaragala":[
+"Diyaluma Falls",
+"Buduruwagala",
+"Madulsima",
+"Yala Block 5"
+],
+
+"Mullaitivu":[
+"Mullaitivu Beach",
+"Mullaitivu Lagoon",
+"Kokkilai Lagoon",
+"War Memorial"
+],
+
+"Nuwara Eliya":[
+"Gregory Lake",
+"Hakgala Botanical Garden",
+"Tea Estates",
+"Moon Plains"
+],
+
+"Polonnaruwa":[
+"Gal Vihara",
+"Parakrama Samudraya",
+"Vatadage",
+"Minneriya National Park"
+],
+
+"Puttalam":[
+"Wilpattu National Park",
+"Kalpitiya Beach",
+"St. Anne's Church",
+"Dutch Fort"
+],
+
+"Ratnapura":[
+"Sinharaja Forest",
+"Bopath Ella Falls",
+"Adam's Peak",
+"Gem Museum"
+],
+
+"Trincomalee":[
+"Nilaveli Beach",
+"Pigeon Island",
+"Koneswaram Temple",
+"Marble Beach"
+],
+
+"Vavuniya":[
+"Madukanda Temple",
+"Vavuniya Museum",
+"Vavuniya Tank",
+"Arasamkulam"
+]
+
+};
+
+function showHome(){
+
+home.style.display="grid";
+details.style.display="none";
+
+let html="";
+
+districts.forEach(d=>{
+
+html += `
+<div class="place"
+onclick="show('${d}')">
+${d}
+</div>
+`;
+
+});
+
+home.innerHTML=html;
+
+}
+
+showHome();
+
+function search(val){
+
+let filtered=districts.filter(x =>
+x.toLowerCase().includes(val.toLowerCase())
+);
+
+let html="";
+
+filtered.forEach(d=>{
+
+html += `
+<div class="place"
+onclick="show('${d}')">
+${d}
+</div>
+`;
+
+});
+
+home.innerHTML=html;
+
+}
+
+function toggleDarkMode(){
+
+document.body.classList.toggle("dark");
+
+}
+
+function languageToggle(){
+
+sinhala=!sinhala;
+
+if(sinhala){
+
+showNotification("🇱🇰 Sinhala Mode Enabled");
+
+}else{
+
+showNotification("🇬🇧 English Mode Enabled");
+
+}
+
+}
+
+function showNotification(text){
+
+let n=document.getElementById("notify");
+
+n.style.display="block";
+n.innerText=text;
+
+setTimeout(()=>{
+
+n.style.display="none";
+
+},3000);
+
+}
+
+function toggleFav(item){
+
+let fav=JSON.parse(localStorage.getItem("fav"))||[];
+
+if(fav.includes(item)){
+
+fav=fav.filter(f=>f!==item);
+
+}else{
+
+fav.push(item);
+
+}
+
+localStorage.setItem("fav",JSON.stringify(fav));
+
+}
+
+function showFavorites(){
+
+home.style.display="none";
+details.style.display="block";
+
+title.innerText="❤️ Favorites";
+
+let fav=JSON.parse(localStorage.getItem("fav"))||[];
+
+let html="";
+
+if(fav.length===0){
+
+html="<div class='card'>No favorites yet ❤️</div>";
+
+}else{
+
+fav.forEach(f=>{
+
+html += `
+<div class="card">
+<h3>${f}</h3>
+</div>
+`;
+
+});
+
+}
+
+content.innerHTML=html;
+
+}
+
+function showTrending(){
+
+home.style.display="none";
+details.style.display="block";
+
+title.innerText="🔥 Trending Places";
+
+content.innerHTML=`
+
+<div class="card">
+
+<h3>🔥 Most Popular Destinations</h3>
+
+<div class="review">Ella</div>
+<div class="review">Sigiriya</div>
+<div class="review">Mirissa</div>
+<div class="review">Galle Fort</div>
+<div class="review">Arugam Bay</div>
+
+</div>
+
+`;
+
+}
+
+function showTravelTips(){
+
+home.style.display="none";
+details.style.display="block";
+
+title.innerText="🧳 Travel Tips";
+
+content.innerHTML=`
+
+<div class="card">
+
+<div class="tip">
+☀️ Best travel season:
+December - April
+</div>
+
+<div class="tip">
+💧 Carry water bottles
+</div>
+
+<div class="tip">
+🚕 Use PickMe or Uber
+</div>
+
+<div class="tip">
+🌧 Carry raincoat for hill country
+</div>
+
+</div>
+
+`;
+
+}
+
+function showAirportInfo(){
+
+home.style.display="none";
+details.style.display="block";
+
+title.innerText="✈ Airport Information";
+
+content.innerHTML=`
+
+<div class="card">
+
+<h3>Bandaranaike International Airport</h3>
+
+<div class="review">
+📍 Katunayake
+</div>
+
+<div class="review">
+🕒 Open 24 Hours
+</div>
+
+<div class="review">
+🚕 Taxi Available
+</div>
+
+</div>
+
+`;
+
+}
+
+function showTrainInfo(){
+
+home.style.display="none";
+details.style.display="block";
+
+title.innerText="🚆 Train Information";
+
+content.innerHTML=`
+
+<div class="card">
+
+<div class="review">
+Colombo → Kandy
+</div>
+
+<div class="review">
+Kandy → Ella
+</div>
+
+<div class="review">
+Colombo → Galle
+</div>
+
+</div>
+
+`;
+
+}
+
+function showLiveTrainSchedule(){
+
+home.style.display="none";
+details.style.display="block";
+
+title.innerText="🚆 Live Train Schedule";
+
+content.innerHTML=`
+
+<div class="card">
+
+<h2>🚆 Colombo Fort → Kandy</h2>
+
+<div class="review">
+🕒 Departure: 5:55 AM
+</div>
+
+<div class="review">
+📍 Arrival: 8:47 AM
+</div>
+
+<div class="review">
+🚉 Train: Intercity Express
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>🚆 Colombo Fort → Ella</h2>
+
+<div class="review">
+🕒 Departure: 6:30 AM
+</div>
+
+<div class="review">
+📍 Arrival: 3:20 PM
+</div>
+
+<div class="review">
+🚉 Train: Udarata Menike
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>🚆 Colombo Fort → Galle</h2>
+
+<div class="review">
+🕒 Departure: 7:00 AM
+</div>
+
+<div class="review">
+📍 Arrival: 9:30 AM
+</div>
+
+<div class="review">
+🚉 Train: Southern Express
+</div>
+
+</div>
+
+`;
+
+}
+
+function getUserLocation(){
+
+if(navigator.geolocation){
+
+navigator.geolocation.getCurrentPosition(pos=>{
+
+showNotification(
+"📍 Location detected"
+);
+
+});
+
+}else{
+
+showNotification(
+"❌ Location not supported"
+);
+
+}
+
+}
+
+function show(place){
+
+home.style.display="none";
+details.style.display="block";
+
+title.innerText=place;
+
+let fav=JSON.parse(localStorage.getItem("fav"))||[];
+
+let html="";
+
+(places[place]||[]).forEach(item=>{
+
+let heart=fav.includes(item)
+? "❤️"
+: "🤍";
+
+html += `
+
+<div class="card">
+
+<img src="https://picsum.photos/500/300?random=${item}">
+
+<h2>${item}</h2>
+
+<div
+style="font-size:24px;cursor:pointer;"
+onclick="toggleFav('${item}')">
+
+${heart}
+
+</div>
+
+<div class="gallery">
+
+<img src="https://picsum.photos/300/200?1=${item}">
+
+<img src="https://picsum.photos/300/200?2=${item}">
+
+<img src="https://picsum.photos/300/200?3=${item}">
+
+</div>
+
+<h3 style="margin-top:15px;">
+☁ Weather
+</h3>
+
+<div class="review"
+id="weather-${item}">
+
+Loading weather...
+
+</div>
+
+<h3 style="margin-top:15px;">
+📍 Map
+</h3>
+
+<iframe
+width="100%"
+height="250"
+src="https://www.google.com/maps?q=${item},Sri Lanka&output=embed">
+</iframe>
+
+<h3 style="margin-top:15px;">
+💬 Reviews
+</h3>
+
+<textarea
+placeholder="Write review...">
+</textarea>
+
+<button class="action">
+Post Review
+</button>
+
+</div>
+
+`;
+
+});
+
+content.innerHTML=html;
+
+(places[place]||[]).forEach(item=>{
+
+fetch(`https://wttr.in/${item}?format=j1`)
+.then(res=>res.json())
+.then(data=>{
+
+let current=data.current_condition[0];
+
+document.getElementById(
+`weather-${item}`
+).innerHTML=`
+
+🌡 ${current.temp_C}°C <br>
+
+☁ ${current.weatherDesc[0].value} <br>
+
+💧 Humidity:
+${current.humidity}% <br>
+
+🌬 Wind:
+${current.windspeedKmph} km/h
+
+`;
+
+});
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
